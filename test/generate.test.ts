@@ -31,6 +31,10 @@ void describe("generatePrPack", () => {
     assert.equal(result.pack.metadata.artifactSources.length, 2);
     assert.match(await readFile(join(cwd, "PR_PACK.md"), "utf8"), /Generated: 2026-01-02T03:04:05.000Z/);
     assert.match(await readFile(join(cwd, "PR_BODY.md"), "utf8"), /## Summary/);
+    const snippets = await readFile(resolve("fixtures", "expected", "with-artifacts-snippets.md"), "utf8");
+    for (const snippet of snippets.split("\n\n").filter(Boolean)) {
+      assert.ok(result.pack.markdown.includes(snippet.trim()), `missing snapshot snippet: ${snippet}`);
+    }
   });
 
   void it("falls back gracefully without artifacts or git", async () => {
