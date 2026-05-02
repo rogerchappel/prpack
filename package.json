@@ -24,7 +24,7 @@
     "build": "tsc -p tsconfig.json && node scripts/fix-bin-mode.mjs",
     "check": "tsc -p tsconfig.json --noEmit",
     "test": "npm run build && node --test dist/test/**/*.test.js",
-    "smoke": "npm run build && node dist/src/cli.js generate --cwd fixtures/with-artifacts --output ../../tmp/prpack-smoke/PR_PACK.md --pr-body ../../tmp/prpack-smoke/PR_BODY.md --json"
+    "smoke": "npm run build && bash scripts/smoke.sh"
   },
   "keywords": [
     "pull-request",
