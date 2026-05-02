@@ -2,26 +2,29 @@
 
 ## Supported Versions
 
-Replace this section with the supported versions for `prpack`.
+`prpack` is pre-1.0. Until the first tagged release, security fixes land on `main` and in the next package release when packaging begins.
 
-Example:
-
-```md
 | Version | Supported |
 | --- | --- |
-| .x | Yes |
-| < .0 | No |
-```
+| `main` | Best effort |
+| `< 0.1.0` | No |
 
-If the project does not publish versioned releases yet, say that clearly.
+## Local-first security posture
+
+V1 intentionally avoids high-risk behaviors:
+
+- no telemetry
+- no hidden network calls
+- no PR creation
+- no GitHub token requirement
+- no LLM or hosted processing dependency
+- read-only git metadata commands
 
 ## Reporting a Vulnerability
 
 Please do not report suspected vulnerabilities in public issues, pull requests, or discussions.
 
-Ask maintainers for the private security reporting path before sharing details.
-
-If no private reporting path exists yet, ask maintainers through public project channels for a private reporting path. Do not include exploit details, secrets, personal data, or sensitive technical details in public messages.
+Use GitHub private vulnerability reporting if enabled for `rogerchappel/prpack`. If it is not available yet, open a public issue asking for a private reporting path without exploit details, secrets, personal data, or sensitive technical details.
 
 ## What to Include
 
@@ -33,17 +36,11 @@ When a private reporting path is available, include:
 - Potential impact.
 - Suggested mitigation, if known.
 
-## Response Expectations
-
-Maintainers review good-faith reports as capacity allows.
-
-Do not imply paid support, guaranteed response times, guaranteed fixes, or service-level agreements unless `prpack` explicitly provides them.
-
 ## Scope
 
 In scope:
 
-- Vulnerabilities in prpack.
+- Vulnerabilities in `prpack`.
 - Insecure default configuration shipped by this project.
 - CI, release, or dependency guidance maintained by this project.
 
