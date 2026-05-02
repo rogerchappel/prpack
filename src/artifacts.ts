@@ -74,7 +74,7 @@ export function normalizeQualityGate(raw: unknown, sourcePath?: string): Quality
   };
 }
 
-export async function discoverArtifacts(cwd: string, extraPaths: string[] = []): Promise<{ branchBrief?: BranchBriefArtifact; qualityGate?: QualityGateArtifact; sources: string[]; warnings: string[] }> {
+export async function discoverArtifacts(cwd: string, extraPaths: string[] = []): Promise<{ branchBrief?: BranchBriefArtifact | undefined; qualityGate?: QualityGateArtifact | undefined; sources: string[]; warnings: string[] }> {
   const paths = [...extraPaths, ...DEFAULT_ARTIFACT_PATHS];
   const sources: string[] = [];
   const warnings: string[] = [];
