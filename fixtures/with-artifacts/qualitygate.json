@@ -1,0 +1,9 @@
+{
+  "status": "pass",
+  "summary": "All local checks passed in the fixture.",
+  "commands": ["npm test", "npm run check", "npm run build"],
+  "checks": [
+    { "name": "unit tests", "status": "pass", "details": "snapshot assertions passed" },
+    { "name": "typecheck", "status": "pass" }
+  ]
+}

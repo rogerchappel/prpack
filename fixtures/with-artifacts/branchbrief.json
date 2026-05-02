@@ -1,0 +1,12 @@
+{
+  "title": "Add deterministic PR pack generation",
+  "summary": "Generate a reviewer-ready PR handoff from local artifacts and git metadata.",
+  "changes": [
+    "Add artifact discovery for branchbrief and qualitygate JSON",
+    "Render PR_PACK.md and reusable PR body markdown"
+  ],
+  "testing": ["npm test", "npm run build"],
+  "risks": ["Markdown formatting could drift if templates change"],
+  "rollout": ["Regenerate the pack locally before opening a PR"],
+  "followUps": ["Collect real-world artifact shape examples"]
+}
