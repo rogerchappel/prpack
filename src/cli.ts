@@ -40,6 +40,13 @@ function parseArgs(argv: string[]): CliOptions {
   const options: CliOptions = { cwd: process.cwd(), output: "PR_PACK.md", json: false, noWrite: false, artifacts: [], help: false, version: false };
   const args = [...argv];
   options.command = args.shift();
+  if (options.command === "--help" || options.command === "-h") {
+    options.help = true;
+    options.command = undefined;
+  } else if (options.command === "--version" || options.command === "-v") {
+    options.version = true;
+    options.command = undefined;
+  }
   while (args.length) {
     const arg = args.shift();
     if (!arg) continue;
@@ -65,12 +72,12 @@ async function readVersion(): Promise<string> {
 
 export async function run(argv = process.argv.slice(2)): Promise<void> {
   const options = parseArgs(argv);
-  if (!options.command || options.help) {
-    console.log(help);
-    return;
-  }
   if (options.version) {
     console.log(await readVersion());
+    return;
+  }
+  if (!options.command || options.help) {
+    console.log(help);
     return;
   }
   if (options.command !== "generate") throw new Error(`Unknown command: ${options.command}`);
