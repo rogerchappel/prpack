@@ -1,0 +1,28 @@
+{
+  "project": "prpack",
+  "owner": "oss-factory-subagent",
+  "workspace": "/Users/roger/Developer/my-opensource/prpack",
+  "repo": "rogerchappel/prpack",
+  "visibility": "public",
+  "commitTarget": { "min": 30, "max": 50 },
+  "requiredGates": [
+    "npm test",
+    "npm run check",
+    "npm run build",
+    "npm run smoke",
+    "bash scripts/validate.sh",
+    "real CLI smoke with fixtures"
+  ],
+  "safety": {
+    "localFirst": true,
+    "noHiddenTelemetry": true,
+    "noSecrets": true,
+    "explicitNetworkOnly": true
+  },
+  "publish": {
+    "host": "github.com",
+    "owner": "rogerchappel",
+    "branch": "main",
+    "protectMainHelper": "/Users/roger/.openclaw/workspace/scripts/protect-github-main.sh"
+  }
+}
