@@ -1,33 +1,33 @@
 # Roadmap
 
 This roadmap describes intended direction, not a binding delivery promise.
-Review it regularly and update it as the project learns from users,
-contributors, and implementation constraints.
 
 ## Now
 
-- Define the smallest useful project scope.
-- Keep repository setup, documentation, and verification easy for contributors
-  to follow.
-- Ship small, reviewable improvements.
+- Harden `prpack generate` from real repositories and artifact shapes.
+- Keep V1 deterministic, local-first, and dependency-light.
+- Improve examples around agent-authored PR handoffs.
 
 ## Next
 
-- Add the next capabilities that directly support the project's primary users.
-- Improve tests, docs, and examples around the most used workflows.
-- Reduce setup friction discovered during early use.
+- Add richer artifact schema documentation and validation warnings.
+- Support configurable output sections without making templates fragile.
+- Add more snapshot fixtures for renamed files, deleted files, and no-diff states.
+- Publish the first npm package once the GitHub repository has real usage notes.
 
 ## Later
 
-- Consider larger features after the core workflow is stable.
-- Add automation only where it removes repeated maintainer work.
-- Revisit packaging, deployment, or integration options based on real demand.
+- Optional integrations that can copy output to a clipboard or PR form.
+- Optional template packs for different review cultures.
+- Better monorepo awareness when artifact paths live outside the package root.
 
-## Not Planned
+## Not Planned for V1
 
-- Unrelated platform rewrites without a clear migration path.
-- Mandatory dependencies on a single ecosystem unless the project requires it.
-- Public release dates before maintainers are ready to commit to them.
+- Creating PRs.
+- Posting comments or reviews.
+- Calling LLMs.
+- Telemetry or hosted processing.
+- Mandatory branchbrief or qualitygate dependencies.
 
 ## Roadmap Review
 
