@@ -2,11 +2,11 @@
 import { generatePrPack } from "./generate.js";
 
 interface CliOptions {
-  command?: string;
+  command?: string | undefined;
   cwd: string;
   output: string;
-  prBody?: string;
-  base?: string;
+  prBody?: string | undefined;
+  base?: string | undefined;
   json: boolean;
   noWrite: boolean;
   artifacts: string[];
@@ -75,15 +75,16 @@ export async function run(argv = process.argv.slice(2)): Promise<void> {
   }
   if (options.command !== "generate") throw new Error(`Unknown command: ${options.command}`);
 
-  const result = await generatePrPack({
+  const generateOptions = {
     cwd: options.cwd,
     outputPath: options.output,
-    prBodyPath: options.prBody,
-    baseBranch: options.base,
     artifactPaths: options.artifacts,
     write: !options.noWrite,
     json: options.json,
-  });
+    ...(options.prBody ? { prBodyPath: options.prBody } : {}),
+    ...(options.base ? { baseBranch: options.base } : {}),
+  };
+  const result = await generatePrPack(generateOptions);
 
   if (options.json) {
     console.log(JSON.stringify(result, null, 2));
