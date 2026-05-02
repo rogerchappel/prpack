@@ -5,44 +5,44 @@ export interface GitFileChange {
 
 export interface GitMetadata {
   branch: string;
-  baseBranch?: string;
-  headSha?: string;
-  baseSha?: string;
-  mergeBase?: string;
-  remoteUrl?: string;
+  baseBranch?: string | undefined;
+  headSha?: string | undefined;
+  baseSha?: string | undefined;
+  mergeBase?: string | undefined;
+  remoteUrl?: string | undefined;
   commits: string[];
   changedFiles: GitFileChange[];
-  diffStat?: string;
+  diffStat?: string | undefined;
   isGitRepository: boolean;
 }
 
 export interface BranchBriefArtifact {
-  title?: string;
-  summary?: string;
-  motivation?: string;
-  changes?: string[];
-  testing?: string[];
-  risks?: string[];
-  rollout?: string[];
-  followUps?: string[];
-  reviewers?: string[];
+  title?: string | undefined;
+  summary?: string | undefined;
+  motivation?: string | undefined;
+  changes?: string[] | undefined;
+  testing?: string[] | undefined;
+  risks?: string[] | undefined;
+  rollout?: string[] | undefined;
+  followUps?: string[] | undefined;
+  reviewers?: string[] | undefined;
   raw?: unknown;
-  sourcePath?: string;
+  sourcePath?: string | undefined;
 }
 
 export interface QualityGateArtifact {
-  status?: "pass" | "fail" | "warn" | "unknown";
-  checks?: QualityCheck[];
-  summary?: string;
-  commands?: string[];
+  status?: "pass" | "fail" | "warn" | "unknown" | undefined;
+  checks?: QualityCheck[] | undefined;
+  summary?: string | undefined;
+  commands?: string[] | undefined;
   raw?: unknown;
-  sourcePath?: string;
+  sourcePath?: string | undefined;
 }
 
 export interface QualityCheck {
   name: string;
   status: "pass" | "fail" | "warn" | "skip" | "unknown";
-  details?: string;
+  details?: string | undefined;
 }
 
 export interface ReviewerChecklistItem {
@@ -61,8 +61,8 @@ export interface PrPack {
     warnings: string[];
   };
   git: GitMetadata;
-  branchBrief?: BranchBriefArtifact;
-  qualityGate?: QualityGateArtifact;
+  branchBrief?: BranchBriefArtifact | undefined;
+  qualityGate?: QualityGateArtifact | undefined;
   sections: {
     changes: string[];
     testing: string[];
@@ -78,16 +78,16 @@ export interface PrPack {
 export interface GenerateOptions {
   cwd: string;
   outputPath: string;
-  prBodyPath?: string;
-  baseBranch?: string;
-  now?: Date;
-  write?: boolean;
-  json?: boolean;
-  artifactPaths?: string[];
+  prBodyPath?: string | undefined;
+  baseBranch?: string | undefined;
+  now?: Date | undefined;
+  write?: boolean | undefined;
+  json?: boolean | undefined;
+  artifactPaths?: string[] | undefined;
 }
 
 export interface GenerateResult {
   pack: PrPack;
-  outputPath?: string;
-  prBodyPath?: string;
+  outputPath?: string | undefined;
+  prBodyPath?: string | undefined;
 }
