@@ -1,0 +1,24 @@
+{
+  "status": "pass",
+  "summary": "Local verification completed before handoff.",
+  "commands": [
+    "npm test",
+    "npm run check",
+    "npm run build"
+  ],
+  "checks": [
+    {
+      "name": "unit tests",
+      "status": "pass"
+    },
+    {
+      "name": "typecheck",
+      "status": "pass"
+    },
+    {
+      "name": "smoke",
+      "status": "pass",
+      "details": "Generated PR_PACK.md from fixtures"
+    }
+  ]
+}
