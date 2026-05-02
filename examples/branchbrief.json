@@ -1,0 +1,22 @@
+{
+  "title": "Improve checkout validation",
+  "summary": "Adds deterministic validation before checkout submission.",
+  "changes": [
+    "Validate cart totals before payment handoff",
+    "Surface actionable errors for invalid line items"
+  ],
+  "testing": [
+    "npm test",
+    "npm run smoke"
+  ],
+  "risks": [
+    "Checkout edge cases may need manual review"
+  ],
+  "rollout": [
+    "Deploy behind the existing checkout release process",
+    "Rollback by reverting the PR"
+  ],
+  "followUps": [
+    "Add fixture coverage for discount stacking"
+  ]
+}
