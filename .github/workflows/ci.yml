@@ -54,7 +54,7 @@ jobs:
 
           if [ ! -f package.json ]; then
             echo "No package.json found; skipping Node checks."
-            echo "TODO: add install, lint, test, typecheck, or build commands when this template becomes an app or package."
+            echo "Package verification is configured through package scripts when package.json is present."
             exit 0
           fi
 
