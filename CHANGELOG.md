@@ -6,6 +6,7 @@ This project follows the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 
 ## [Unreleased]
 
+- Added release-readiness validation for package metadata, CI placeholder cleanup, and package smoke coverage.
 ### Added
 
 - `prpack generate` CLI for deterministic PR handoff generation.
