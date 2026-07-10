@@ -49,6 +49,14 @@ Preview without writing files:
 prpack generate --no-write
 ```
 
+Run the fixture-backed artifact demo:
+
+```sh
+bash demo/run-artifact-pack.sh
+```
+
+That writes `tmp/demo-artifact-pack/PR_PACK.md`, `tmp/demo-artifact-pack/PR_BODY.md`, and a JSON result from the sample `branchbrief` and `qualitygate` artifacts.
+
 ## Artifact discovery
 
 `prpack generate` automatically looks for:
@@ -131,6 +139,7 @@ npm run build
 npm run smoke
 npm run package:smoke
 npm run release:check
+bash demo/run-artifact-pack.sh
 bash scripts/validate.sh
 ```
 
