@@ -28,6 +28,24 @@ if (fs.existsSync(workflowDir)) {
 
   const combined = workflowFiles.map((file) => fs.readFileSync(path.join(workflowDir, file), 'utf8')).join('\n');
   requireField(/release:check/.test(combined), 'CI workflows must run npm run release:check');
+
+  const releaseWorkflowPath = path.join(workflowDir, 'release.yml');
+  requireField(fs.existsSync(releaseWorkflowPath), 'repository must include .github/workflows/release.yml');
+  if (fs.existsSync(releaseWorkflowPath)) {
+    const releaseWorkflow = fs.readFileSync(releaseWorkflowPath, 'utf8');
+    requireField(
+      /npm publish --provenance --access public/.test(releaseWorkflow),
+      'release workflow must publish the public package to npm with provenance',
+    );
+    requireField(
+      /registry-url:\s*https:\/\/registry\.npmjs\.org/.test(releaseWorkflow),
+      'release workflow must configure the npm registry',
+    );
+    requireField(
+      /id-token:\s*write/.test(releaseWorkflow),
+      'release workflow must grant OIDC permission for npm trusted publishing',
+    );
+  }
 }
 
 if (failures.length > 0) {
