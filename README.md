@@ -154,6 +154,8 @@ npm run release:check
 
 `release:readiness` validates repository metadata, the package files allowlist, package smoke coverage, and CI placeholder cleanup. `release:check` runs the project build, test, smoke, and package dry-run checks where configured.
 
+Tagged releases matching `v*.*.*` publish the matching package version to npm using trusted publishing, then attach the package tarball to the GitHub release. Before pushing a tag, update `package.json` and `package-lock.json` to the tag version and run `npm run release:check`. The npm package's trusted publisher must be configured for this repository and `.github/workflows/release.yml`.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). Please keep changes small, local-first, deterministic, and easy to review.
