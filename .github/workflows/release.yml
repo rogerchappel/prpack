@@ -26,6 +26,8 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: npm ci
       - run: npm run release:check
+      - name: Publish package to npm
+        run: npm publish --provenance --access public
       - run: npm pack
       - name: Generate release notes
         run: |
