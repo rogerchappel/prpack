@@ -45,6 +45,31 @@ if (fs.existsSync(workflowDir)) {
       /id-token:\s*write/.test(releaseWorkflow),
       'release workflow must grant OIDC permission for npm trusted publishing',
     );
+    requireField(
+      /workflow_dispatch:[\s\S]*tag:[\s\S]*required:\s*true/.test(releaseWorkflow),
+      'release workflow recovery must require an explicit tag input',
+    );
+    requireField(
+      /ref:\s*\$\{\{ github\.event_name == 'workflow_dispatch' && inputs\.tag \|\| github\.ref \}\}/.test(releaseWorkflow),
+      'release workflow recovery must check out the requested tag',
+    );
+    requireField(
+      /tag_commit=.*rev-parse "refs\/tags\/\$REQUESTED_TAG\^\{commit\}"[\s\S]*head_commit=.*rev-parse HEAD[\s\S]*"\$tag_commit" != "\$head_commit"/.test(releaseWorkflow),
+      'release workflow must reject a requested tag that does not match the checked-out ref',
+    );
+    requireField(
+      /REQUESTED_TAG" != "v\$package_version"/.test(releaseWorkflow),
+      'release workflow must reject a tag that does not match the package version',
+    );
+    requireField(
+      /if:\s*steps\.npm\.outputs\.published != 'true'[\s\S]*npm publish --provenance --access public/.test(releaseWorkflow),
+      'release workflow must not republish an existing npm package version',
+    );
+    requireField(
+      /if:\s*github\.event_name != 'workflow_dispatch'[\s\S]*gh release create/.test(releaseWorkflow) &&
+        /if:\s*github\.event_name == 'workflow_dispatch'[\s\S]*gh release view/.test(releaseWorkflow),
+      'release recovery must confirm the existing GitHub release without creating a duplicate',
+    );
   }
 }
 
