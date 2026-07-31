@@ -156,6 +156,18 @@ npm run release:check
 
 Tagged releases matching `v*.*.*` publish the matching package version to npm using trusted publishing, then attach the package tarball to the GitHub release. Before pushing a tag, update `package.json` and `package-lock.json` to the tag version and run `npm run release:check`. The npm package's trusted publisher must be configured for this repository and `.github/workflows/release.yml`.
 
+### Recover an existing release tag
+
+Use the manual **Release** workflow only when a valid existing tag and GitHub release were created but npm publication did not complete:
+
+1. Confirm the tag is the intended immutable release and that its `package.json` version matches (for example, `v0.1.0` and `0.1.0`).
+2. In GitHub Actions, open **Release**, choose **Run workflow**, enter that exact tag in the `tag` field, and run it from the default branch.
+3. Review the run summary and confirm the package version on npm.
+
+The recovery run checks out the requested tag, verifies that the tag commit is the checked-out commit, verifies the package version, and runs the full release checks before publishing with provenance and public access. It checks npm first and skips publication if that exact version already exists. It also requires the existing GitHub release and never tries to create a second release.
+
+This path is safe to retry after a partial failure. A failure before `npm publish` makes no registry change. If publication succeeds but a later packaging or release-confirmation step fails, rerun the same tag: the workflow detects the published version, skips `npm publish`, and continues its checks. If the GitHub release is missing, create or restore it through a reviewed maintainer action before retrying; recovery intentionally fails instead of silently creating one.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). Please keep changes small, local-first, deterministic, and easy to review.
