@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { execFile } from "node:child_process";
-import { access, rm } from "node:fs/promises";
+import { access, mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { promisify } from "node:util";
 import { describe, it } from "node:test";
 
@@ -25,5 +27,52 @@ void describe("cli", () => {
 
     assert.equal(stdout.trim(), "function");
     await assert.rejects(() => access("PR_PACK.md"));
+  });
+
+  const invalidInvocations = [
+    { name: "a missing value", args: ["generate", "--output"] },
+    { name: "an option used as a value", args: ["generate", "--output", "--json"] },
+    { name: "a duplicate singleton option", args: ["generate", "--output", "one.md", "--output", "two.md"] },
+    { name: "an unexpected positional argument", args: ["generate", "extra"] },
+  ];
+
+  for (const invocation of invalidInvocations) {
+    void it(`rejects ${invocation.name} before writing output`, async () => {
+      const cwd = await mkdtemp(join(tmpdir(), "prpack-cli-"));
+      const outputPath = join(cwd, "PR_PACK.md");
+
+      try {
+        await assert.rejects(
+          () => execFileAsync(process.execPath, [join(process.cwd(), "dist/src/cli.js"), ...invocation.args], { cwd }),
+          (error: Error & { code?: number; stderr?: string }) => {
+            assert.equal(error.code, 1);
+            assert.match(error.stderr ?? "", /^Usage error: /);
+            return true;
+          },
+        );
+        await assert.rejects(() => access(outputPath));
+      } finally {
+        await rm(cwd, { recursive: true, force: true });
+      }
+    });
+  }
+
+  void it("preserves repeated artifact options", async () => {
+    const { stdout } = await execFileAsync(process.execPath, [
+      "dist/src/cli.js",
+      "generate",
+      "--cwd",
+      "fixtures/with-artifacts",
+      "--artifact",
+      "branchbrief.json",
+      "--artifact",
+      "qualitygate.json",
+      "--json",
+      "--no-write",
+    ]);
+
+    const parsed = JSON.parse(stdout) as { pack: { title: string; qualityGate: { commands: string[] } } };
+    assert.equal(parsed.pack.title, "Add deterministic PR pack generation");
+    assert.ok(parsed.pack.qualityGate.commands.includes("npm test"));
   });
 });
