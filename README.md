@@ -121,6 +121,11 @@ Options:
   -v, --version          Show version
 ```
 
+Invalid invocations exit nonzero before generating or writing files. Options
+that take values reject missing values and other option tokens; all options
+except repeatable `--artifact` reject duplicates, and positional arguments after
+`generate` are not accepted.
+
 ## Safety and local-first guarantees
 
 - No telemetry.
