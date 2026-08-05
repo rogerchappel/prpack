@@ -40,6 +40,16 @@ Examples:
 function parseArgs(argv: string[]): CliOptions {
   const options: CliOptions = { cwd: process.cwd(), output: "PR_PACK.md", json: false, noWrite: false, artifacts: [], help: false, version: false };
   const args = [...argv];
+  const seen = new Set<string>();
+  const markSingleton = (option: string): void => {
+    if (seen.has(option)) throw new Error(`Usage error: duplicate option ${option}`);
+    seen.add(option);
+  };
+  const takeValue = (option: string): string => {
+    const value = args.shift();
+    if (!value || value.startsWith("-")) throw new Error(`Usage error: ${option} requires a value`);
+    return value;
+  };
   options.command = args.shift();
   if (options.command === "--help" || options.command === "-h") {
     options.help = true;
@@ -51,18 +61,35 @@ function parseArgs(argv: string[]): CliOptions {
   while (args.length) {
     const arg = args.shift();
     if (!arg) continue;
-    if (arg === "--cwd") options.cwd = args.shift() ?? options.cwd;
-    else if (arg === "--output") options.output = args.shift() ?? options.output;
-    else if (arg === "--pr-body") options.prBody = args.shift();
-    else if (arg === "--base") options.base = args.shift();
+    if (arg === "--cwd") {
+      markSingleton(arg);
+      options.cwd = takeValue(arg);
+    } else if (arg === "--output") {
+      markSingleton(arg);
+      options.output = takeValue(arg);
+    } else if (arg === "--pr-body") {
+      markSingleton(arg);
+      options.prBody = takeValue(arg);
+    } else if (arg === "--base") {
+      markSingleton(arg);
+      options.base = takeValue(arg);
+    }
     else if (arg === "--artifact") {
-      const artifact = args.shift();
-      if (artifact) options.artifacts.push(artifact);
-    } else if (arg === "--json") options.json = true;
-    else if (arg === "--no-write") options.noWrite = true;
-    else if (arg === "--help" || arg === "-h") options.help = true;
-    else if (arg === "--version" || arg === "-v") options.version = true;
-    else throw new Error(`Unknown option: ${arg}`);
+      options.artifacts.push(takeValue(arg));
+    } else if (arg === "--json") {
+      markSingleton(arg);
+      options.json = true;
+    } else if (arg === "--no-write") {
+      markSingleton(arg);
+      options.noWrite = true;
+    } else if (arg === "--help" || arg === "-h") {
+      markSingleton("--help");
+      options.help = true;
+    } else if (arg === "--version" || arg === "-v") {
+      markSingleton("--version");
+      options.version = true;
+    } else if (arg.startsWith("-")) throw new Error(`Usage error: unknown option ${arg}`);
+    else throw new Error(`Usage error: unexpected positional argument ${arg}`);
   }
   return options;
 }
@@ -81,7 +108,7 @@ export async function run(argv = process.argv.slice(2)): Promise<void> {
     console.log(help);
     return;
   }
-  if (options.command !== "generate") throw new Error(`Unknown command: ${options.command}`);
+  if (options.command !== "generate") throw new Error(`Usage error: unknown command ${options.command}`);
 
   const generateOptions = {
     cwd: options.cwd,
