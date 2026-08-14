@@ -40,8 +40,13 @@ export async function readGitMetadata(cwd: string, baseBranch?: string): Promise
   const diffRange = mergeBase ? `${mergeBase}..HEAD` : "HEAD";
   const baseSha = mergeBase?.slice(0, 7);
   const commitsText = await git(cwd, ["log", "--format=%s", diffRange]);
-  const changedText = await git(cwd, ["diff", "--name-status", mergeBase ?? "HEAD~1", "HEAD"]);
-  const diffStat = await git(cwd, ["diff", "--stat", mergeBase ?? "HEAD~1", "HEAD"]);
+  const comparisonRef = mergeBase ?? (await git(cwd, ["rev-parse", "HEAD^"]));
+  const changedText = comparisonRef
+    ? await git(cwd, ["diff", "--name-status", comparisonRef, "HEAD"])
+    : await git(cwd, ["diff-tree", "--root", "--no-commit-id", "--name-status", "-r", "HEAD"]);
+  const diffStat = comparisonRef
+    ? await git(cwd, ["diff", "--stat", comparisonRef, "HEAD"])
+    : await git(cwd, ["diff-tree", "--root", "--no-commit-id", "--stat", "-r", "HEAD"]);
 
   return {
     branch,
