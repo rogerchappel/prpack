@@ -30,9 +30,10 @@
     "check": "tsc -p tsconfig.json --noEmit",
     "test": "npm run build && node --test dist/test/*.test.js",
     "smoke": "npm run build && bash scripts/smoke.sh",
-    "release:check": "npm run release:readiness && npm run check && npm test && npm run smoke && npm run package:smoke",
+    "release:check": "npm run release:readiness && npm run check && npm test && npm run smoke && npm run package:smoke && npm run version:smoke",
     "package:smoke": "npm run build && node scripts/package-smoke.mjs",
-    "release:readiness": "node scripts/validate-release-readiness.mjs"
+    "release:readiness": "node scripts/validate-release-readiness.mjs",
+    "version:smoke": "npm run build && node scripts/version-smoke.mjs"
   },
   "keywords": [
     "pull-request",
