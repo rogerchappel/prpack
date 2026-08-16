@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { readFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import { generatePrPack } from "./generate.js";
 
@@ -95,7 +96,12 @@ function parseArgs(argv: string[]): CliOptions {
 }
 
 async function readVersion(): Promise<string> {
-  return "0.1.0";
+  const packageUrl = new URL("../../package.json", import.meta.url);
+  const packageJson = JSON.parse(await readFile(packageUrl, "utf8")) as { version?: unknown };
+  if (typeof packageJson.version !== "string" || packageJson.version.length === 0) {
+    throw new Error("Invalid package metadata: package.json must contain a version");
+  }
+  return packageJson.version;
 }
 
 export async function run(argv = process.argv.slice(2)): Promise<void> {

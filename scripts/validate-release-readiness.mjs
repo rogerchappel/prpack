@@ -14,7 +14,12 @@ function requireField(condition, message) {
 requireField(packageJson.repository, 'package.json must declare repository metadata');
 requireField(Array.isArray(packageJson.files) && packageJson.files.length > 0, 'package.json must declare a non-empty files allowlist');
 requireField(scripts['package:smoke'], 'package.json scripts must include package:smoke');
+requireField(scripts['version:smoke'], 'package.json scripts must include version:smoke');
 requireField(scripts['release:check'], 'package.json scripts must include release:check');
+requireField(
+  typeof scripts['release:check'] === 'string' && /npm run version:smoke/.test(scripts['release:check']),
+  'release:check must run the packaged CLI version smoke test',
+);
 
 const workflowDir = path.join(root, '.github', 'workflows');
 if (fs.existsSync(workflowDir)) {
