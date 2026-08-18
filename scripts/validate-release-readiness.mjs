@@ -16,6 +16,8 @@ requireField(Array.isArray(packageJson.files) && packageJson.files.length > 0, '
 requireField(scripts['package:smoke'], 'package.json scripts must include package:smoke');
 requireField(scripts['version:smoke'], 'package.json scripts must include version:smoke');
 requireField(scripts['release:check'], 'package.json scripts must include release:check');
+requireField(scripts['release:availability'], 'package.json scripts must include release:availability');
+requireField(scripts['release:availability:test'], 'package.json scripts must include release:availability:test');
 requireField(
   typeof scripts['release:check'] === 'string' && /npm run version:smoke/.test(scripts['release:check']),
   'release:check must run the packaged CLI version smoke test',
