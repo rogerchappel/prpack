@@ -6,6 +6,7 @@ This project follows the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 
 ## [Unreleased]
 
+- Fixed generated PR packs to retain blank lines between metadata, headings, lists, quality evidence, the embedded PR body, follow-ups, and warnings.
 - Fixed tagged releases so they publish the installable package to npm with provenance before creating the GitHub release.
 - Added release-readiness checks for the npm registry and trusted-publishing configuration.
 - Added release-readiness validation for package metadata, CI placeholder cleanup, and package smoke coverage.
