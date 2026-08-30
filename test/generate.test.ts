@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, cp, readFile, rm } from "node:fs/promises";
+import { mkdtemp, cp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterEach, describe, it } from "node:test";
@@ -24,7 +24,14 @@ void afterEach(async () => {
 void describe("generatePrPack", () => {
   void it("uses branchbrief and qualitygate artifacts when present", async () => {
     const cwd = await fixture("with-artifacts");
-    const result = await generatePrPack({ cwd, outputPath: "PR_PACK.md", prBodyPath: "PR_BODY.md", now: new Date("2026-01-02T03:04:05Z") });
+    await writeFile(join(cwd, "broken-branchbrief.json"), "{", "utf8");
+    const result = await generatePrPack({
+      cwd,
+      outputPath: "PR_PACK.md",
+      prBodyPath: "PR_BODY.md",
+      artifactPaths: ["broken-branchbrief.json"],
+      now: new Date("2026-01-02T03:04:05Z"),
+    });
     assert.match(result.pack.markdown, /Add deterministic PR pack generation/);
     assert.match(result.pack.markdown, /Quality Gate/);
     assert.match(result.pack.prBody, /Reviewer Checklist/);
@@ -35,6 +42,11 @@ void describe("generatePrPack", () => {
     for (const snippet of snippets.split("\n\n").filter(Boolean)) {
       assert.ok(result.pack.markdown.includes(snippet.trim()), `missing snapshot snippet: ${snippet}`);
     }
+    assert.match(result.pack.markdown, /Artifacts: `branchbrief\.json`, `qualitygate\.json`\n\n## Git Context/);
+    assert.match(result.pack.markdown, /- Repository: not detected\n\n### Commits/);
+    assert.match(result.pack.markdown, /## Quality Gate\n\nStatus: \*\*pass\*\*.*\n\n## PR Body\n\n## Summary/s);
+    assert.match(result.pack.markdown, /## Reviewer Checklist.*\n\n## Follow-ups\n\n- Collect real-world artifact shape examples/s);
+    assert.match(result.pack.markdown, /## Follow-ups\n\n- Collect real-world artifact shape examples\n\n## Warnings\n\n- Could not read broken-branchbrief\.json:/);
   });
 
   void it("falls back gracefully without artifacts or git", async () => {
