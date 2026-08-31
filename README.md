@@ -122,7 +122,7 @@ Options:
   --cwd <path>           Repository to inspect (default: current directory)
   --output <path>        Markdown pack path (default: PR_PACK.md)
   --pr-body <path>       Also write PR body text to this path
-  --base <branch>        Base branch name for git comparison
+  --base <branch>        Existing local or origin branch for git comparison
   --artifact <path>      Extra artifact path to read (repeatable)
   --json                 Print JSON result for automation
   --no-write             Do not write files; print output only
@@ -134,6 +134,11 @@ Invalid invocations exit nonzero before generating or writing files. Options
 that take values reject missing values and other option tokens; all options
 except repeatable `--artifact` reject duplicates, and positional arguments after
 `generate` are not accepted.
+
+`--base main` prefers `origin/main` when it exists and otherwise accepts a
+local `main` branch. An explicit `origin/main` is also accepted. If the named
+branch cannot be resolved to a commit, generation fails nonzero instead of
+falling back to a different comparison.
 
 ## Safety and local-first guarantees
 
