@@ -36,4 +36,47 @@ void describe("git helpers", () => {
       await rm(cwd, { recursive: true, force: true });
     }
   });
+
+  void it("rejects an explicitly requested base that cannot be resolved", async () => {
+    const cwd = await mkdtemp(join(tmpdir(), "prpack-git-missing-base-"));
+
+    try {
+      execFileSync("git", ["init", "--quiet"], { cwd });
+      await writeFile(join(cwd, "README.md"), "# Initial\n");
+      execFileSync("git", ["add", "README.md"], { cwd });
+      execFileSync("git", ["-c", "user.name=Test User", "-c", "user.email=test@example.com", "commit", "--quiet", "-m", "initial"], { cwd });
+
+      await assert.rejects(readGitMetadata(cwd, "definitely-missing"), /Unable to resolve base branch "definitely-missing"/);
+    } finally {
+      await rm(cwd, { recursive: true, force: true });
+    }
+  });
+
+  void it("compares against local and origin-prefixed base branches", async () => {
+    const cwd = await mkdtemp(join(tmpdir(), "prpack-git-valid-base-"));
+
+    try {
+      execFileSync("git", ["init", "--quiet", "--initial-branch=main"], { cwd });
+      await writeFile(join(cwd, "README.md"), "# Initial\n");
+      execFileSync("git", ["add", "README.md"], { cwd });
+      execFileSync("git", ["-c", "user.name=Test User", "-c", "user.email=test@example.com", "commit", "--quiet", "-m", "initial"], { cwd });
+      execFileSync("git", ["branch", "feature"], { cwd });
+      execFileSync("git", ["update-ref", "refs/remotes/origin/main", "refs/heads/main"], { cwd });
+      execFileSync("git", ["checkout", "--quiet", "feature"], { cwd });
+      await writeFile(join(cwd, "feature.txt"), "feature\n");
+      execFileSync("git", ["add", "feature.txt"], { cwd });
+      execFileSync("git", ["-c", "user.name=Test User", "-c", "user.email=test@example.com", "commit", "--quiet", "-m", "feature"], { cwd });
+
+      const local = await readGitMetadata(cwd, "main");
+      const remote = await readGitMetadata(cwd, "origin/main");
+
+      assert.equal(local.baseBranch, "main");
+      assert.equal(remote.baseBranch, "main");
+      assert.deepEqual(local.changedFiles, [{ status: "A", path: "feature.txt" }]);
+      assert.deepEqual(remote.changedFiles, local.changedFiles);
+      assert.equal(remote.mergeBase, local.mergeBase);
+    } finally {
+      await rm(cwd, { recursive: true, force: true });
+    }
+  });
 });
