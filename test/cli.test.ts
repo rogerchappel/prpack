@@ -21,6 +21,33 @@ void describe("cli", () => {
     assert.match(parsed.pack.prBody, /Reviewer Checklist/);
   });
 
+  void it("uses an explicitly resolved base for JSON generation", async () => {
+    const { stdout } = await execFileAsync(process.execPath, ["dist/src/cli.js", "generate", "--base", "main", "--json", "--no-write"]);
+    const parsed = JSON.parse(stdout) as { pack: { git: { baseBranch?: string; mergeBase?: string } } };
+
+    assert.equal(parsed.pack.git.baseBranch, "main");
+    assert.match(parsed.pack.git.mergeBase ?? "", /^[0-9a-f]{40}$/);
+  });
+
+  void it("rejects an unresolved explicit base without writing output", async () => {
+    const cwd = await mkdtemp(join(tmpdir(), "prpack-cli-missing-base-"));
+    const outputPath = join(cwd, "PR_PACK.md");
+
+    try {
+      await assert.rejects(
+        () => execFileAsync(process.execPath, [join(process.cwd(), "dist/src/cli.js"), "generate", "--cwd", process.cwd(), "--base", "definitely-missing"], { cwd }),
+        (error: Error & { code?: number; stderr?: string }) => {
+          assert.equal(error.code, 1);
+          assert.match(error.stderr ?? "", /Unable to resolve base branch "definitely-missing"/);
+          return true;
+        },
+      );
+      await assert.rejects(() => access(outputPath));
+    } finally {
+      await rm(cwd, { recursive: true, force: true });
+    }
+  });
+
   void it("can be imported without running the CLI", async () => {
     await rm("PR_PACK.md", { force: true });
     const { stdout } = await execFileAsync(process.execPath, ["--input-type=module", "--eval", "import('./dist/src/cli.js').then((mod) => console.log(typeof mod.run))"]);
