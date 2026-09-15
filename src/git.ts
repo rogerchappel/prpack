@@ -35,6 +35,18 @@ async function resolveBaseRef(cwd: string, requestedBase: string): Promise<strin
     const resolved = await git(cwd, ["rev-parse", "--verify", "--quiet", `${candidate}^{commit}`]);
     if (resolved) return candidate;
   }
+  
+  // If we couldn't resolve the base, try to fetch it
+  if (!requestedBase.startsWith("origin/")) {
+    try {
+      await git(cwd, ["fetch", "origin", requestedBase]);
+      const resolved = await git(cwd, ["rev-parse", "--verify", "--quiet", `origin/${requestedBase}^{commit}`]);
+      if (resolved) return `origin/${requestedBase}`;
+    } catch {
+      // If fetch fails, continue with the original behavior
+    }
+  }
+  
   return undefined;
 }
 
