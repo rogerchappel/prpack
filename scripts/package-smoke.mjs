@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -55,11 +55,19 @@ try {
     throw new Error(`Installed prpack --version returned ${JSON.stringify(version)}; expected ${pack.version}.`);
   }
 
-  const generated = execFileSync(executable, ['generate', '--cwd', process.cwd(), '--no-write'], {
+  const consumerDirectory = join(temporaryDirectory, 'consumer');
+  mkdirSync(consumerDirectory);
+  const generated = execFileSync(executable, ['generate'], {
+    cwd: consumerDirectory,
     encoding: 'utf8',
   });
-  if (!generated.startsWith('# ') || !generated.includes('\nGenerated: ') || !generated.includes('\n## Git Context')) {
-    throw new Error('Installed prpack generate command did not emit a PR handoff pack.');
+  const generatedPath = join(consumerDirectory, 'PR_PACK.md');
+  if (generated !== 'Wrote ' + generatedPath + '\n') {
+    throw new Error(`Installed prpack generate output was ${JSON.stringify(generated)}; expected the documented output-file confirmation.`);
+  }
+  const generatedPack = readFileSync(generatedPath, 'utf8');
+  if (!generatedPack.startsWith('# ') || !generatedPack.includes('\nGenerated: ') || !generatedPack.includes('\n## Git Context')) {
+    throw new Error('Installed prpack generate command did not write a PR handoff pack in the consumer directory.');
   }
 
   const linkedEntrypoint = readFileSync(executable, 'utf8');
@@ -67,7 +75,7 @@ try {
     throw new Error('Installed prpack bin link did not resolve to the packaged entrypoint.');
   }
 
-  console.log('Installed bin smoke OK: --help, --version, and generate succeeded through node_modules/.bin/prpack.');
+  console.log('Installed bin smoke OK: --help, --version, and generate wrote the documented output from a separate consumer directory.');
 } finally {
   rmSync(temporaryDirectory, { recursive: true, force: true });
 }
