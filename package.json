@@ -61,14 +61,12 @@
   "homepage": "https://github.com/rogerchappel/prpack#readme",
   "devDependencies": {
     "@types/node": "^25.6.0",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "undici-types": "^7.30.0"
   },
   "directories": {
     "doc": "docs",
     "example": "examples",
     "test": "test"
-  },
-  "dependencies": {
-    "undici-types": "^7.19.2"
   }
 }
