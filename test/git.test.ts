@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { chmod, mkdir } from "node:fs/promises";
+import { access, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it } from "node:test";
@@ -46,7 +47,23 @@ void describe("git helpers", () => {
       execFileSync("git", ["add", "README.md"], { cwd });
       execFileSync("git", ["-c", "user.name=Test User", "-c", "user.email=test@example.com", "commit", "--quiet", "-m", "initial"], { cwd });
 
-      await assert.rejects(readGitMetadata(cwd, "definitely-missing"), /Unable to resolve base branch "definitely-missing"/);
+      const bin = join(cwd, "bin");
+      const fetchMarker = join(cwd, "fetch-called");
+      await mkdir(bin);
+      const realGit = execFileSync("which", ["git"], { encoding: "utf8" }).trim();
+      const wrapper = join(bin, "git");
+      await writeFile(wrapper, `#!/bin/sh\nif [ "$1" = fetch ]; then touch "${fetchMarker}"; fi\nexec "${realGit}" "$@"\n`);
+      await chmod(wrapper, 0o755);
+
+      const originalPath = process.env.PATH;
+      process.env.PATH = `${bin}:${originalPath ?? ""}`;
+      try {
+        await assert.rejects(readGitMetadata(cwd, "definitely-missing"), /Unable to resolve base branch "definitely-missing"/);
+      } finally {
+        if (originalPath === undefined) delete process.env.PATH;
+        else process.env.PATH = originalPath;
+      }
+      await assert.rejects(access(fetchMarker));
     } finally {
       await rm(cwd, { recursive: true, force: true });
     }
